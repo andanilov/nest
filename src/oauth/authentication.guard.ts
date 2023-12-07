@@ -52,7 +52,7 @@ export class AuthenticationGuard implements CanActivate {
       // request['user'] = await this.usersProvider.getUser({ id });
       // if (!request['user']) return true;
       request['user'] = { id: 123, email: 'test@test.com', roles: { name: 'Client' } };
-    } catch (err) {   
+    } catch (err) {
       throw new UnauthorizedException();
     }
 

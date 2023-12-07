@@ -6,3 +6,48 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model oauths {
+  idOauth Int      @id @default(autoincrement())
+  token   String   @db.Text
+  refresh String   @db.Text
+  expires DateTime @db.Timestamp(6)
+  ua      String   @default("") @db.VarChar(255)
+  ip      String   @default("::") @db.VarChar(64)
+  userId  String   @db.VarChar(36)
+  device  String   @default("") @db.VarChar(36)
+  model   String   @default("") @db.VarChar(128)
+  
+  users   users[]  @relation("oauthsToUsers")
+  @@index([userId], map: "userId_key")
+}
+
+model roles {
+  idRole      Int     @id
+  name        String  @unique(map: "name") @db.VarChar(100)
+  description String  @default("") @db.VarChar(500)
+  priority    Int?    @db.TinyInt
+  users       users[] @relation("rolesToUsers")
+}
+
+model users {
+  idUser            String   @id @unique(map: "uuid") @default(uuid()) @db.VarChar(36)
+  email             String   @unique(map: "email") @db.VarChar(100)
+  password          String   @db.VarChar(200)
+  firstName         String   @db.VarChar(64)
+  lastName          String?  @db.VarChar(128)
+  isActive          Boolean  @default(false)
+  timeCreated       DateTime @default(now()) @db.Timestamp(6)
+  activationKey     String?  @db.VarChar(50)
+  activationCreated DateTime @default(now()) @db.Timestamp(6)
+  lastIp            String?  @db.VarChar(20)
+  lastUserAgent     String?  @db.VarChar(255)
+  isEmailVerified   Boolean? @default(false)
+  blockReason       String?  @db.Text
+  phone             String?  @db.VarChar(30)
+  avatarURL         String?  @db.VarChar(256)
+
+  roles             roles[]  @relation("rolesToUsers")
+  oauths            oauths[] @relation("oauthsToUsers")
+  @@index([email], map: "email_2")
+}
